@@ -1,11 +1,13 @@
 import express, { json } from 'express';
 import authRouter from './routes/auth';
+import postRouter from './routes/post';
 
 const app = express();
 
 app.use(json());
 
 app.use('/auth', authRouter);
+app.use('/post', postRouter);
 
 
 app.listen(3001, () => {

@@ -59,7 +59,7 @@ export const login = async (req: Request, res: Response) => {
 
         const token = jwt.sign({ id: data[0].id }, 'jwtkey');
         const { password, ...other } = data[0];
-        res
+        return res
             .cookie('access_token', token, {
                 httpOnly: true,
             })
@@ -69,5 +69,11 @@ export const login = async (req: Request, res: Response) => {
 }
 
 export const logout = async (req: Request, res: Response) => {
-    console.log('logout');
+    return res
+        .clearCookie('access_token', {
+            sameSite: 'none',
+            secure: true,
+        })
+        .status(200)
+        .json('User has been logged out')
 }

@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import { v4 as uuid } from 'uuid';
 import { db } from "../config/db";
+import { UserInfo } from "../types/user";
 
 export const getPosts = (req: Request, res: Response) => {
     const cat = req.query.cat;
@@ -21,7 +24,7 @@ export const getPosts = (req: Request, res: Response) => {
 
 export const getPost = (req: Request, res: Response) => {
     const q =
-        "SELECT p.id, `username`, `title`, `desc`, `img`, `cat`,`date` FROM users u JOIN posts p ON u.id = p.uid WHERE p.id = ? ";
+        'SELECT p.id, `username`, `title`, `desc`, `img`, `cat`,`date` FROM users u JOIN posts p ON u.id = p.uid WHERE p.id = ?';
 
     db.query(q, [req.params.id], (err, data) => {
         if (err) {
@@ -41,7 +44,37 @@ export const getPost = (req: Request, res: Response) => {
 }
 
 export const addPost = (req: Request, res: Response) => {
-    console.log('addPost');
+    const token = req.cookies.access_token;
+    if (!token) return res.status(401).json("Not authenticated!");
+
+    jwt.verify(token, "jwtkey", (err: any, userInfo: UserInfo) => {
+        if (err) {
+            return res
+                .status(403)
+                .json("Token is not valid!")
+        }
+
+        const q = 'INSERT INTO posts(`id`,`title`, `desc`, `img`, `cat`, `date`,`uid`) VALUES (?)';
+        const values = [
+            uuid(),
+            req.body.title,
+            req.body.desc,
+            req.body.img,
+            req.body.cat,
+            req.body.date,
+            userInfo.id,
+        ];
+        db.query(q, [values], (err, data) => {
+            if (err) {
+                return res
+                    .status(500)
+                    .json(err)
+            }
+            return res
+                .status(200)
+                .json("Post has been created.")
+        });
+    });
 }
 
 export const deletePost = (req: Request, res: Response) => {

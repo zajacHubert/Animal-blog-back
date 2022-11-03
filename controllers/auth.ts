@@ -54,7 +54,7 @@ export const login = async (req: Request, res: Response) => {
         if (!isPasswordCorrect) {
             return res
                 .status(400)
-                .json('Wrong passowrd')
+                .json('Wrong password')
         }
 
         const token = jwt.sign({ id: data[0].id }, 'jwtkey');

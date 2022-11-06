@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 import { v4 as uuid } from 'uuid';
 import { db } from "../config/db";
 
-
 export const register = async (req: Request, res: Response) => {
     const q = 'SELECT * FROM `users` WHERE `email` = ? OR `username` = ?';
     db.query(q, [req.body.username, req.body.password], (err, data) => {
@@ -65,7 +64,7 @@ export const login = async (req: Request, res: Response) => {
             })
             .status(200)
             .json(other)
-    })
+    });
 }
 
 export const logout = async (req: Request, res: Response) => {
